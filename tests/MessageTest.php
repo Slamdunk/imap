@@ -614,7 +614,7 @@ final class MessageTest extends AbstractTest
     /**
      * @see https://github.com/ddeboer/imap/issues/200
      */
-    public function testGetAllHeaders()
+    public function testGetInfoHeaders()
     {
         $this->mailbox->addMessage($this->getFixture('bcc'));
 
@@ -631,6 +631,23 @@ final class MessageTest extends AbstractTest
         $this->assertSame('A_€@{è_Z', $headers['bcc'][0]->personal);
 
         $this->assertFalse($message->isSeen());
+    }
+
+    public function testGetAllRfc822Headers()
+    {
+        $this->mailbox->addMessage($this->getFixture('custom_header'));
+
+        $message = $this->mailbox->getMessage(1);
+
+        $headers = $message->getHeaders();
+        $this->assertGreaterThan(9, \count($headers));
+        $this->assertArrayNotHasKey('x-abc', $headers);
+
+        $headers = $message->getAllHeaders();
+        $this->assertGreaterThan(9, \count($headers));
+        \print_r($headers);
+        $this->assertArrayHasKey('x-abc', $headers);
+        $this->assertSame('FooBar', $headers['x-abc']);
     }
 
     public function testSetFlags()

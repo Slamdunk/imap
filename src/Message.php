@@ -10,6 +10,7 @@ use Ddeboer\Imap\Exception\MessageDeleteException;
 use Ddeboer\Imap\Exception\MessageDoesNotExistException;
 use Ddeboer\Imap\Exception\MessageMoveException;
 use Ddeboer\Imap\Exception\MessageStructureException;
+use Ddeboer\Imap\Message\Headers;
 
 /**
  * An IMAP message (e-mail).
@@ -30,6 +31,11 @@ final class Message extends Message\AbstractMessage implements MessageInterface
      * @var null|Message\Headers
      */
     private $headers;
+
+    /**
+     * @var null|Message\Headers
+     */
+    private $allHeaders;
 
     /**
      * @var null|string
@@ -143,6 +149,10 @@ final class Message extends Message\AbstractMessage implements MessageInterface
 
     /**
      * Get message headers.
+     * WARNING: Only a subset of all the headers is returned, for performance reasons.
+     * See https://secure.php.net/manual/en/function.imap-headerinfo.php.
+     *
+     * @see Message::getAllHeaders() To retrieve all available headers
      *
      * @return Message\Headers
      */
@@ -161,6 +171,22 @@ final class Message extends Message\AbstractMessage implements MessageInterface
         }
 
         return $this->headers;
+    }
+
+    /**
+     * Get all the message headers.
+     *
+     * @return Message\Headers
+     */
+    public function getAllHeaders(): Message\Headers
+    {
+        if (null === $this->allHeaders) {
+            \var_dump($this->getRawHeaders());
+            \var_dump(\imap_rfc822_parse_headers($this->getRawHeaders()));
+            $this->allHeaders = new Message\Headers(\imap_rfc822_parse_headers($this->getRawHeaders()));
+        }
+
+        return $this->allHeaders;
     }
 
     /**

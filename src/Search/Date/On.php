@@ -13,12 +13,9 @@ use Ddeboer\Imap\Search\AbstractDate;
 final class On extends AbstractDate
 {
     /**
-     * Returns the keyword that the condition represents.
-     *
-     * @return string
+     * {@inheritDoc}
      */
     protected function getKeyword(): string
     {
-        return 'ON';
     }
 }
